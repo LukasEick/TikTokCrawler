@@ -1,15 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>TikTok Message Manager</title>
-    <script src="app.js" defer></script>
+  <meta charset="UTF-8" />
+  <title>TikTok Message Tool</title>
+  <script src="app.js" defer></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f5f5f5;
+      margin: 0;
+    }
+
+    .container {
+      text-align: center;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+      cursor: pointer;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-size: 14px;
+      color: green;
+    }
+
+    #messages {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .msg {
+      background-color: #eee;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
-    <h1>TikTok API Test</h1>
+  <div class="container">
+    <h2>TikTok Message Tool</h2>
+
     <input type="text" id="username" placeholder="Username" />
     <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-    <button onclick="fetchMessages()">Fetch Messages</button>
+
+    <button onclick="login()">🔐 Login</button>
+    <button onclick="fetchMessages()">📥 Fetch Messages</button>
+
+    <div id="status"></div>
     <div id="messages"></div>
+  </div>
 </body>
 </html>

@@ -6,6 +6,34 @@ from supabase_client import store_messages, get_messages
 from sessions import create_session, get_user
 from models import TikTokCredentials
 import uvicorn
+from supabase import create_client
+from typing import List
+from playwright.sync_api import sync_playwright
+import os
+from supabase_client import supabase
+from fastapi.responses import JSONResponse
+
+
+
+
+def store_messages(user_id: str, messages: list):
+    for msg in messages:
+        try:
+            supabase.table("messages").insert({
+                "user_id": user_id,
+                "sender": msg['sender'],
+                "content": msg['content'],
+                "timestamp": msg['timestamp']
+            }).execute()
+        except Exception as e:
+            print("❌ Fehler beim Einfügen:", e)
+            print("↪ Nachricht war:", msg)
+
+
+
+STATE_FILE = "state.json"
+
+
 
 app = FastAPI()
 
@@ -34,7 +62,8 @@ def fetch_messages(request: Request):
 
     messages = login_and_fetch_messages(user, "DEMO_PASSWORD")  # Passwort aus Frontend oder Token
     store_messages(user, messages)
-    return {"messages": messages}
+    print("📤 Sende Nachrichten an Frontend:", messages)
+    return JSONResponse(content=messages)
 
 @app.get("/messages")
 def get_saved_messages(session_id: str):
