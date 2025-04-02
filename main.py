@@ -1,5 +1,4 @@
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from tiktok_client import login_and_fetch_messages
 from supabase_client import store_messages, get_messages
@@ -17,11 +16,7 @@ import uuid
 from supabase_client import store_session
 from supabase_client import get_username_from_session
 from tiktok_client import load_tiktok_state, save_tiktok_state
-
-
-
-
-
+from fastapi.middleware.cors import CORSMiddleware
 
 
 def store_messages(user_id: str, messages: list):
@@ -40,6 +35,14 @@ def store_messages(user_id: str, messages: list):
 
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://unique-licorice-bdb5cd.netlify.app"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 sessions = {}
 
 
