@@ -11,7 +11,7 @@ async def login_and_fetch_messages(username: str, password: str) -> list:
     headless_mode = os.path.exists(state_file)
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=False)
+        browser = await p.chromium.launch(headless=True)
 
         if headless_mode:
             context = await browser.new_context(storage_state=state_file)
@@ -28,7 +28,7 @@ async def login_and_fetch_messages(username: str, password: str) -> list:
             print("🔐 Bitte manuell einloggen und danach ENTER drücken...")
             input("⏳ Warte auf manuelle Anmeldung...")
 
-        await page.wait_for_timeout(3000)
+        await page.wait_for_timeout(60000)
 
         chat_items = await page.query_selector_all('[data-e2e="chat-list-item"]')
 
