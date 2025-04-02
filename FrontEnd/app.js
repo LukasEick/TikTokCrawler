@@ -10,7 +10,7 @@ async function login() {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
-    const res = await fetch("https://tiktokcrawler.onrender.com/login", {
+    const res = await fetch("https://tiktokcrawler-1.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
@@ -39,7 +39,7 @@ async function fetchMessages() {
 
     setStatus("⏳ Load Messages...");
 
-    const res = await fetch(`https://tiktokcrawler.onrender.com/fetch_messages?session_id=${sessionId}`, {
+    const res = await fetch(`https://https://tiktokcrawler-1.onrender.com/fetch_messages?session_id=${sessionId}`, {
     method: "POST"
     });
 
