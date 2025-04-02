@@ -45,17 +45,6 @@ app.add_middleware(
 
 sessions = {}
 
-
-origins = ["*"]  # Für Netlify
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 @app.post("/login")
 async def login(request: Request):
     data = await request.json()
