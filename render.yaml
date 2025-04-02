@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: tiktok-backend
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SUPABASE_URL
+        value: dein_wert
+      - key: SUPABASE_KEY
+        value: dein_wert
