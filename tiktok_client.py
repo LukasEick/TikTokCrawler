@@ -2,6 +2,7 @@ from playwright.async_api import async_playwright
 import os
 import json
 from supabase_client import save_tiktok_state
+from supabase_client import supabase
 
 async def login_and_fetch_messages(username: str, password: str) -> list:
     username = username.strip().lower().replace(" ", "_")
@@ -64,3 +65,15 @@ async def login_and_fetch_messages(username: str, password: str) -> list:
         await browser.close()
 
     return messages
+
+def load_tiktok_state(username: str) -> bool:
+    try:
+        result = supabase.table("tiktok_sessions").select("state_json").eq("username", username).execute()
+        data = result.data
+        if data and len(data) > 0:
+            with open(f"state_{username}.json", "w") as f:
+                json.dump(data[0]["state_json"], f)
+            return True
+    except Exception as e:
+        print("❌ Fehler beim Laden der TikTok-Session:", e)
+    return False
