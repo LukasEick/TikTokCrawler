@@ -37,23 +37,22 @@ async function fetchMessages() {
         return setStatus("⚠️ Bitte zuerst einloggen!", true);
     }
 
-    setStatus("⏳ Load Messages...");
-
-    const res = await fetch(`https://https://tiktokcrawler-1.onrender.com/fetch_messages?session_id=${sessionId}`, {
-    method: "POST"
-    });
-
+    setStatus("⏳ Lade Nachrichten...");
 
     let data;
     try {
+        const res = await fetch(`https://tiktokcrawler-1.onrender.com/fetch_messages?session_id=${sessionId}`, {
+            method: "POST"
+        });
+
         data = await res.json();
         console.log("📦 Nachrichten vom Server:", data);
+
     } catch (e) {
-        console.error("❌ Fehler beim Parsen der Serverantwort:", e);
-        setStatus("❌ Ungültige Antwort vom Server", true);
+        console.error("❌ Fehler beim Abrufen der Nachrichten:", e);
+        setStatus("❌ Serverfehler – bitte später erneut versuchen", true);
         return;
     }
-
 
     const container = document.getElementById("messages");
     container.innerHTML = "";
@@ -74,8 +73,8 @@ async function fetchMessages() {
         container.appendChild(div);
     });
 
-    setStatus(`✅ ${data.length} Messages loaded.`);
+    setStatus(`✅ ${data.length} Nachrichten geladen.`);
 }
 
-console.log("📦 Nachrichten vom Server:", data);
+
 
