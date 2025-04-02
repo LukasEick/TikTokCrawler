@@ -14,9 +14,9 @@ with sync_playwright() as p:
 
     # Versuche zu speichern
     try:
-        state_path = os.path.join(os.getcwd(), "state.json")
+        state_path = os.path.join(os.getcwd(), "state_lukas_eick.json")
         context.storage_state(path=state_path)
-        print(f"💾 state.json gespeichert unter: {state_path}")
+        print(f"💾 state_lukas_eick.json gespeichert unter: {state_path}")
     except Exception as e:
         print(f"❌ Fehler beim Speichern: {e}")
 

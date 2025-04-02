@@ -2,7 +2,7 @@ from playwright.sync_api import sync_playwright
 import os
 
 # Pfad zur gespeicherten Sitzung
-STATE_FILE = os.path.join(os.path.dirname(__file__), "state.json")
+STATE_FILE = os.path.join(os.path.dirname(__file__), "state_lukas_eick.json")
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=False)
