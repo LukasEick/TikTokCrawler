@@ -11,7 +11,7 @@ async def login_and_fetch_messages(username: str, password: str) -> list:
     headless_mode = os.path.exists(state_file)
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=headless_mode)
+        browser = await p.chromium.launch(headless=False)
 
         if headless_mode:
             context = await browser.new_context(storage_state=state_file)
@@ -21,7 +21,8 @@ async def login_and_fetch_messages(username: str, password: str) -> list:
             print("🆕 Neue Session gestartet – manueller Login nötig.")
 
         page = await context.new_page()
-        await page.goto("https://www.tiktok.com/messages")
+        await page.goto("https://www.tiktok.com/messages", timeout=60000)
+
 
         if not headless_mode:
             print("🔐 Bitte manuell einloggen und danach ENTER drücken...")
