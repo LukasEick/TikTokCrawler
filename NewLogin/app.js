@@ -1,34 +1,29 @@
 async function startOnboarding() {
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
 
-    if (!username || !password) {
-        alert("Bitte fülle alle Felder aus.");
-        return;
-    }
-
-    document.getElementById('status').innerText = "🚀 Starte Session Erstellung, bitte warten...";
+    setStatus("🚀 Starte Onboarding...");
 
     try {
-        const res = await fetch('https://tiktokcrawler-1.onrender.com/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("https://tiktokcrawler-1.onrender.com/onboarding", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })
         });
 
-        if (!res.ok) {
-            throw new Error("Fehler beim Erstellen der Session.");
+        const data = await res.json();
+
+        if (data.session_id) {
+            setStatus("✅ Session erfolgreich erstellt!");
+            // Optional weiterleiten
+            setTimeout(() => {
+                window.location.href = "https://deine-hauptseite.netlify.app";
+            }, 2000);
+        } else {
+            setStatus("❌ Fehler beim Erstellen der Session!", true);
         }
-
-        document.getElementById('status').innerText = "✅ Session erfolgreich erstellt! Weiterleitung...";
-
-        // Kleine Verzögerung für UX
-        setTimeout(() => {
-            window.location.href = "/"; // Zur Hauptseite
-        }, 2000);
-
     } catch (error) {
         console.error(error);
-        document.getElementById('status').innerText = "❌ Fehler: " + error.message;
+        setStatus("❌ Fehler beim Onboarding", true);
     }
 }

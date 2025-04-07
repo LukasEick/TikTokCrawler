@@ -77,6 +77,23 @@ async def login(request: Request):
         "registered": already_registered
     }
 
+
+@app.post("/onboarding")
+async def onboarding(request: Request):
+    data = await request.json()
+    username = data.get("username")
+    password = data.get("password")
+
+    # Session erstellen (wie im Login)
+    session_id = str(uuid.uuid4())
+    sessions[session_id] = username
+
+    # 🚀 Direkt TikTok Login ausführen
+    await login_and_fetch_messages(username, password)
+
+    return {"message": "Onboarding erfolgreich!", "session_id": session_id}
+
+
 @app.post("/fetch_messages")
 async def fetch_messages(session_id: str):
     print("🧪 Session-ID erhalten:", session_id)
