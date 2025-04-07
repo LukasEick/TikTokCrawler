@@ -19,6 +19,7 @@ from tiktok_client import load_tiktok_state, save_tiktok_state
 from fastapi.middleware.cors import CORSMiddleware
 
 
+
 def store_messages(user_id: str, messages: list):
     for msg in messages:
         try:
@@ -35,13 +36,20 @@ def store_messages(user_id: str, messages: list):
 
 
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Oder spezifische Domains wenn du später wieder sicher willst
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Optional: CORS-Preflight Test-Endpoint (hilft beim Debuggen)
+@app.options("/{rest_of_path:path}")
+async def preflight_handler():
+    return JSONResponse(content={"message": "CORS preflight success"})
+
 
 sessions = {}
 
