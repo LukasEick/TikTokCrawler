@@ -1,3 +1,17 @@
+async function checkSession(username) {
+    try {
+        const res = await fetch(`https://tiktokcrawler-1.onrender.com/check_session?username=${username}`);
+        const data = await res.json();
+
+        if (!data.exists) {
+            // Keine Session gefunden → Weiterleitung
+            window.location.href = "/onboarding.html";
+        }
+    } catch (error) {
+        console.error("❌ Fehler beim Session Check:", error);
+    }
+}
+
 let sessionId = localStorage.getItem("session_id") || "";
 
 function setStatus(msg, isError = false) {
@@ -10,6 +24,17 @@ async function login() {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
+    // 🔍 Session-Check HINZUFÜGEN
+    const sessionCheck = await fetch(`https://tiktokcrawler-1.onrender.com/check_session?username=${username}`);
+    const sessionData = await sessionCheck.json();
+
+    if (!sessionData.exists) {
+        // Weiterleitung zur Onboarding-Seite
+        window.location.href = "https://zippy-phoenix-774f67.netlify.app";
+        return; // Stoppe hier den Login, weil es noch keine Session gibt
+    }
+
+    // 🔥 Danach deine bestehende Login-Logik
     const res = await fetch("https://tiktokcrawler-1.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -31,6 +56,7 @@ async function login() {
         setStatus("❌ Login fehlgeschlagen!", true);
     }
 }
+
 
 async function fetchMessages() {
     if (!sessionId) {

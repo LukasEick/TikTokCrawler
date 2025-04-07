@@ -37,13 +37,28 @@ def store_messages(user_id: str, messages: list):
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://serene-biscuit-c4a067.netlify.app"],
+    allow_origins=[
+        "https://serene-biscuit-c4a067.netlify.app",
+        "https://zippy-phoenix-774f67.netlify.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 sessions = {}
+
+@app.get("/check_session")
+async def check_session(username: str):
+    try:
+        result = supabase.table("tiktok_sessions").select("username").eq("username", username).execute()
+        if result.data and len(result.data) > 0:
+            return {"exists": True}
+        else:
+            return {"exists": False}
+    except Exception as e:
+        print("❌ Fehler beim Session-Check:", e)
+        return {"exists": False}
 
 @app.post("/login")
 async def login(request: Request):
