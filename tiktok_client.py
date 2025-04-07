@@ -21,14 +21,18 @@ async def login_and_fetch_messages(username: str, password: str) -> list:
             print("🆕 Neue Session gestartet – manueller Login nötig.")
 
         page = await context.new_page()
-        await page.goto("https://www.tiktok.com/messages", timeout=6000)
+        await page.goto("https://www.tiktok.com/messages", timeout=60000)
 
 
         if not headless_mode:
             print("🔐 Bitte manuell einloggen und danach ENTER drücken...")
             input("⏳ Warte auf manuelle Anmeldung...")
 
-        await page.wait_for_timeout(6000)
+        try:
+            await page.wait_for_selector('[data-e2e="chat-list-item"]', timeout=15000)  # oder auch 20000 wenn nötig
+        except Exception as e:
+            print("⚠️ Chat-Liste wurde nicht rechtzeitig gefunden:", e)
+            await page.screenshot(path="error_screenshot.png")
 
         chat_items = await page.query_selector_all('[data-e2e="chat-list-item"]')
 
