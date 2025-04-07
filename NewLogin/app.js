@@ -1,3 +1,16 @@
+function setStatus(message, isError = false) {
+    const statusElement = document.getElementById("status");
+    if (!statusElement) return;
+
+    statusElement.textContent = message;
+    statusElement.style.color = isError ? "red" : "green";
+
+    statusElement.style.opacity = "1";
+    setTimeout(() => {
+        statusElement.style.opacity = "0.8";
+    }, 3000);
+}
+
 async function startOnboarding() {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;

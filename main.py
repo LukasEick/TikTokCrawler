@@ -37,10 +37,7 @@ def store_messages(user_id: str, messages: list):
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://serene-biscuit-c4a067.netlify.app",
-        "https://zippy-phoenix-774f67.netlify.app"
-    ],
+    allow_origins=["*"]
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
