@@ -1,8 +1,9 @@
 from playwright.sync_api import sync_playwright
 import os
 import json
-from supabase_client import save_tiktok_state
-from supabase_client import supabase
+import time
+from supabase_client import save_tiktok_state, supabase
+
 
 def login_and_fetch_messages(username: str, password: str) -> list:
     username = username.strip().lower().replace(" ", "_")
@@ -12,48 +13,51 @@ def login_and_fetch_messages(username: str, password: str) -> list:
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
-        context = browser.new_context()
+
+        # ✅ Session Wiederverwendung
+        if headless_mode:
+            context = browser.new_context(storage_state=state_file)
+            print(f"✅ Bestehende Session geladen: {state_file}")
+        else:
+            context = browser.new_context()
+            print("🆕 Neue Session gestartet – automatischer Login wird versucht.")
+
         page = context.new_page()
 
-        print("🆕 Neue Session gestartet – automatischer Login wird versucht.")
-        page.goto("https://www.tiktok.com/login", timeout=60000)
+        if not headless_mode:
+            try:
+                # 🔐 TikTok Login Seite öffnen
+                page.goto("https://www.tiktok.com/login", timeout=60000)
 
-        try:
-            # Schritt 1: "Mit Telefon/E-Mail/Benutzername fortfahren" klicken
-            page.locator('text=Mit Telefon / E-Mail / Benutzername fortfahren').click()
+                # Login Methode auswählen
+                page.locator('text=Mit Telefon / E-Mail / Benutzername fortfahren').click(timeout=10000)
+                page.locator('text=E-Mail / Benutzername').click(timeout=10000)
 
-            # Schritt 2: "E-Mail / Benutzername" klicken
-            page.locator('text=E-Mail / Benutzername').click()
+                # Login-Daten ausfüllen
+                page.locator('input[name="username"]').fill(username)
+                page.locator('input[name="password"]').fill(password)
 
-            # Schritt 3: Username ausfüllen
-            page.locator('input[name="username"]').fill(username)
+                # Login-Button klicken
+                page.locator('button:has-text("Einloggen")').click()
 
-            # Schritt 4: Passwort ausfüllen
-            page.locator('input[name="password"]').fill(password)
+                # Warte kurz, bis TikTok reagiert
+                page.wait_for_timeout(5000)
 
-            # Schritt 5: Login Button klicken
-            page.locator('button:has-text("Einloggen")').click()
+            except Exception as e:
+                print(f"⚠️ Fehler beim automatischen Login: {e}")
+                timestamp = int(time.time())
+                page.screenshot(path=f"login_error_{timestamp}.png")
+                print("🔐 Bitte manuell einloggen...")
+                page.wait_for_timeout(30000)  # Optional mehr Zeit
 
-            # Warten bis Weiterleitung kommt (Anpassen falls nötig)
-            page.wait_for_timeout(5000)
-
-        except Exception as e:
-            print(f"⚠️ Fehler beim automatischen Ausfüllen: {e}")
-            print("🔐 Bitte manuell einloggen...")
-
-            # Screenshot zur Fehlersuche
-            page.screenshot(path="login_error.png")
-
-            # Optional: Mehr Zeit geben
-            page.wait_for_timeout(30000)
-
-        # Warten auf Nachrichten-Seite oder ähnliches
+        # ✅ Nachrichten abrufen
         try:
             page.goto("https://www.tiktok.com/messages", timeout=60000)
             page.wait_for_selector('[data-e2e="chat-list-item"]', timeout=15000)
         except Exception as e:
             print(f"⚠️ Fehler beim Laden der Nachrichten-Seite: {e}")
-            page.screenshot(path="messages_error.png")
+            timestamp = int(time.time())
+            page.screenshot(path=f"messages_error_{timestamp}.png")
 
         chat_items = page.query_selector_all('[data-e2e="chat-list-item"]')
 
@@ -71,25 +75,26 @@ def login_and_fetch_messages(username: str, password: str) -> list:
 
                 sender = p_tags[0].inner_text()
                 content = span_tags[0].inner_text()
-                timestamp = span_tags[1].inner_text()
+                timestamp_msg = span_tags[1].inner_text()
 
                 messages.append({
                     "sender": sender,
                     "content": content,
-                    "timestamp": timestamp
+                    "timestamp": timestamp_msg
                 })
 
             except Exception as e:
-                print("[WARNUNG] Fehler beim Auslesen:", e)
+                print("[WARNUNG] Fehler beim Auslesen einer Nachricht:", e)
                 continue
 
-        # ✅ Session speichern & in Supabase hochladen
+        # ✅ Session speichern & Supabase aktualisieren
         context.storage_state(path=state_file)
         save_tiktok_state(username, state_file)
 
         browser.close()
 
     return messages
+
 
 def load_tiktok_state(username: str) -> bool:
     try:

@@ -1,5 +1,6 @@
-// 🌐 Definiere deine API-Basis-URL — hier dein NGROK-Link!
-const API_BASE = "https://8948-2406-3003-2001-3643-ecf7-4449-2f4f-d175.ngrok-free.app"; // << DEIN AKTUELLER NGROK LINK!
+
+const API_BASE = "https://a438-2a01-4f8-c17-eb2e-00-1.ngrok-free.app";
+
 
 // Session-Check Funktion
 async function checkSession(username) {
@@ -9,7 +10,7 @@ async function checkSession(username) {
 
         if (!data.exists) {
             // Keine Session gefunden → Weiterleitung zur Onboarding-Seite
-            window.location.href = "teal-cheesecake-9a0880.netlify.app"; // Deine Onboarding-Seite
+            window.location.href = "https://teal-cheesecake-9a0880.netlify.app"; // Deine Onboarding-Seite
         }
     } catch (error) {
         console.error("❌ Fehler beim Session Check:", error);
@@ -37,7 +38,7 @@ async function login() {
 
         if (!sessionData.exists) {
             // Weiterleitung zur Onboarding-Seite, wenn keine Session existiert
-            window.location.href = "teal-cheesecake-9a0880.netlify.app";
+            window.location.href = "https://teal-cheesecake-9a0880.netlify.app";
             return;
         }
 
