@@ -1,57 +1,77 @@
-from playwright.async_api import async_playwright
+from playwright.sync_api import sync_playwright
 import os
 import json
 from supabase_client import save_tiktok_state
 from supabase_client import supabase
 
-async def login_and_fetch_messages(username: str, password: str) -> list:
+def login_and_fetch_messages(username: str, password: str) -> list:
     username = username.strip().lower().replace(" ", "_")
     messages = []
     state_file = f"state_{username}.json"
     headless_mode = os.path.exists(state_file)
 
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)
+        context = browser.new_context()
+        page = context.new_page()
 
-        if headless_mode:
-            context = await browser.new_context(storage_state=state_file)
-            print(f"✅ Bestehende Session geladen: {state_file}")
-        else:
-            context = await browser.new_context()
-            print("🆕 Neue Session gestartet – manueller Login nötig.")
-
-        page = await context.new_page()
-        await page.goto("https://www.tiktok.com/messages", timeout=60000)
-
-
-        if not headless_mode:
-            print("🔐 Bitte manuell einloggen und danach ENTER drücken...")
-            input("⏳ Warte auf manuelle Anmeldung...")
+        print("🆕 Neue Session gestartet – automatischer Login wird versucht.")
+        page.goto("https://www.tiktok.com/login", timeout=60000)
 
         try:
-            await page.wait_for_selector('[data-e2e="chat-list-item"]', timeout=15000)  # oder auch 20000 wenn nötig
-        except Exception as e:
-            print("⚠️ Chat-Liste wurde nicht rechtzeitig gefunden:", e)
-            await page.screenshot(path="error_screenshot.png")
+            # Schritt 1: "Mit Telefon/E-Mail/Benutzername fortfahren" klicken
+            page.locator('text=Mit Telefon / E-Mail / Benutzername fortfahren').click()
 
-        chat_items = await page.query_selector_all('[data-e2e="chat-list-item"]')
+            # Schritt 2: "E-Mail / Benutzername" klicken
+            page.locator('text=E-Mail / Benutzername').click()
+
+            # Schritt 3: Username ausfüllen
+            page.locator('input[name="username"]').fill(username)
+
+            # Schritt 4: Passwort ausfüllen
+            page.locator('input[name="password"]').fill(password)
+
+            # Schritt 5: Login Button klicken
+            page.locator('button:has-text("Einloggen")').click()
+
+            # Warten bis Weiterleitung kommt (Anpassen falls nötig)
+            page.wait_for_timeout(5000)
+
+        except Exception as e:
+            print(f"⚠️ Fehler beim automatischen Ausfüllen: {e}")
+            print("🔐 Bitte manuell einloggen...")
+
+            # Screenshot zur Fehlersuche
+            page.screenshot(path="login_error.png")
+
+            # Optional: Mehr Zeit geben
+            page.wait_for_timeout(30000)
+
+        # Warten auf Nachrichten-Seite oder ähnliches
+        try:
+            page.goto("https://www.tiktok.com/messages", timeout=60000)
+            page.wait_for_selector('[data-e2e="chat-list-item"]', timeout=15000)
+        except Exception as e:
+            print(f"⚠️ Fehler beim Laden der Nachrichten-Seite: {e}")
+            page.screenshot(path="messages_error.png")
+
+        chat_items = page.query_selector_all('[data-e2e="chat-list-item"]')
 
         for item in chat_items:
             try:
-                text_wrapper = await item.query_selector('div[class*="InfoTextWrapper"]')
+                text_wrapper = item.query_selector('div[class*="InfoTextWrapper"]')
                 if not text_wrapper:
-                    print("[WARNUNG] Element fehlt – wird übersprungen.")
                     continue
 
-                p_tags = await text_wrapper.query_selector_all("p")
-                span_tags = await text_wrapper.query_selector_all("span")
+                p_tags = text_wrapper.query_selector_all("p")
+                span_tags = text_wrapper.query_selector_all("span")
 
                 if len(p_tags) < 1 or len(span_tags) < 2:
                     continue
 
-                sender = await p_tags[0].inner_text()
-                content = await span_tags[0].inner_text()
-                timestamp = await span_tags[1].inner_text()
+                sender = p_tags[0].inner_text()
+                content = span_tags[0].inner_text()
+                timestamp = span_tags[1].inner_text()
 
                 messages.append({
                     "sender": sender,
@@ -64,10 +84,10 @@ async def login_and_fetch_messages(username: str, password: str) -> list:
                 continue
 
         # ✅ Session speichern & in Supabase hochladen
-        await context.storage_state(path=state_file)
+        context.storage_state(path=state_file)
         save_tiktok_state(username, state_file)
 
-        await browser.close()
+        browser.close()
 
     return messages
 

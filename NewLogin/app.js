@@ -12,31 +12,41 @@ function setStatus(message, isError = false) {
 }
 
 async function startOnboarding() {
-    const username = document.getElementById("username").value;
+    const username = document.getElementById("username").value.trim().toLowerCase().replace(" ", "_");
     const password = document.getElementById("password").value;
+
+    if (!username || !password) {
+        setStatus("❌ Bitte Username und Passwort eingeben!", true);
+        return;
+    }
 
     setStatus("🚀 Starte Onboarding...");
 
     try {
-        const res = await fetch("https://tiktokcrawler-1.onrender.com/onboarding", {
+        const res = await fetch("https://8948-2406-3003-2001-3643-ecf7-4449-2f4f-d175.ngrok-free.app/onboarding", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })
         });
 
+        if (!res.ok) {
+            throw new Error("Server antwortete mit Fehler");
+        }
+
         const data = await res.json();
 
         if (data.session_id) {
             setStatus("✅ Session erfolgreich erstellt!");
-            // Optional weiterleiten
+
+            // ✅ Optional: Automatische Weiterleitung zur Hauptseite
             setTimeout(() => {
-                window.location.href = "https://deine-hauptseite.netlify.app";
+                window.location.href = "https://serene-biscuit-c4a067.netlify.app"; // Deine Hauptseite!
             }, 2000);
         } else {
-            setStatus("❌ Fehler beim Erstellen der Session!", true);
+            setStatus("❌ Session-Erstellung fehlgeschlagen!", true);
         }
     } catch (error) {
-        console.error(error);
-        setStatus("❌ Fehler beim Onboarding", true);
+        console.error("❌ Fehler beim Onboarding:", error);
+        setStatus("❌ Fehler beim Onboarding – bitte später erneut versuchen.", true);
     }
 }

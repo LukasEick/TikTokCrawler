@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
 from supabase import create_client, Client
+import json
+
 
 load_dotenv()
 
@@ -53,6 +55,9 @@ def get_username_from_session(session_id: str) -> str | None:
 
 def save_tiktok_state(username: str, state_file_path: str):
     try:
+        if not os.path.exists(state_file_path):
+            print(f"❌ State-Datei {state_file_path} existiert nicht!")
+            return
         with open(state_file_path, "r") as f:
             state_data = json.load(f)
         supabase.table("tiktok_sessions").upsert({
