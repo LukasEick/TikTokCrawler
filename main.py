@@ -19,14 +19,18 @@ if sys.platform.startswith('win'):
 
 app = FastAPI()
 
-# CORS Einstellungen
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Im Test offen, später Domain angeben!
+    allow_origins=[
+        "https://serene-biscuit-c4a067.netlify.app",
+        "https://teal-cheesecake-9a0880.netlify.app",
+        "https://a438-2a01-4f8-c17-eb2e-00-1.ngrok-free.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Preflight für CORS
 @app.options("/{rest_of_path:path}")
