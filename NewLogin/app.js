@@ -23,7 +23,7 @@ async function startOnboarding() {
     setStatus("🚀 Starte Onboarding...");
 
     try {
-        const res = await fetch("https://a438-2a01-4f8-c17-eb2e-00-1.ngrok-free.app/onboarding", {
+        const res = await fetch("https://004e-2401-7400-4016-9ed8-2df4-debb-8cd5-e1ad.ngrok-free.app/onboarding", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })

@@ -23,8 +23,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://serene-biscuit-c4a067.netlify.app",
-        "https://teal-cheesecake-9a0880.netlify.app",
-        "https://a438-2a01-4f8-c17-eb2e-00-1.ngrok-free.app"
+        "https://scintillating-frangollo-7c41ad.netlify.app",
+        "https://004e-2401-7400-4016-9ed8-2df4-debb-8cd5-e1ad.ngrok-free.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],

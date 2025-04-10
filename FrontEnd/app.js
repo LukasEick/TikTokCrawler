@@ -1,5 +1,5 @@
 
-const API_BASE = "https://a438-2a01-4f8-c17-eb2e-00-1.ngrok-free.app";
+const API_BASE = "https://004e-2401-7400-4016-9ed8-2df4-debb-8cd5-e1ad.ngrok-free.app";
 
 
 // Session-Check Funktion
@@ -10,7 +10,7 @@ async function checkSession(username) {
 
         if (!data.exists) {
             // Keine Session gefunden → Weiterleitung zur Onboarding-Seite
-            window.location.href = "https://teal-cheesecake-9a0880.netlify.app"; // Deine Onboarding-Seite
+            window.location.href = "https://scintillating-frangollo-7c41ad.netlify.app"; // Deine Onboarding-Seite
         }
     } catch (error) {
         console.error("❌ Fehler beim Session Check:", error);
@@ -38,7 +38,7 @@ async function login() {
 
         if (!sessionData.exists) {
             // Weiterleitung zur Onboarding-Seite, wenn keine Session existiert
-            window.location.href = "https://teal-cheesecake-9a0880.netlify.app";
+            window.location.href = "https://scintillating-frangollo-7c41ad.netlify.app";
             return;
         }
 
