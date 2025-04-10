@@ -12,7 +12,7 @@ def login_and_fetch_messages(username: str, password: str) -> list:
     headless_mode = os.path.exists(state_file)
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)
 
         # ✅ Session Wiederverwendung
         if headless_mode:
